@@ -3,8 +3,14 @@ const { Sequelize } = require('sequelize')
 const fs = require('fs')
 const path = require('path')
 
+const DB_USER = 'postgres';
+const DB_PASSWORD = 'A12345';
+const DB_HOST = 'localhost:5432';
+const DB_NAME = 'repasopimatifa';
+
+
 const sequelize = new Sequelize(
-  `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/repasopi`,
+  `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
   {
     logging: false, // set to console.log to see the raw SQL queries
     native: false, // lets Sequelize know we can use pg-native for ~30% more speed
@@ -36,8 +42,11 @@ sequelize.models = Object.fromEntries(capsEntries)
 
 // En sequelize.models están todos los modelos importados como propiedades
 // Para relacionarlos hacemos un destructuring
+const {Character, Episode} = sequelize.models;
 
 // Aca vendrian las relaciones
+Character.belongsToMany(Episode, {through:'character_episode'});
+Episode.belongsToMany(Character, {through:'character_episode'});
 
 module.exports = {
   ...sequelize.models, // para poder importar los modelos así: const { Product, User } = require('./db.js');
